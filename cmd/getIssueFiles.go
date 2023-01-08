@@ -1,6 +1,7 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/package cmd
+*/
+package cmd
 
 import (
 	"fmt"
@@ -21,9 +22,6 @@ var getIssueFilesCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(getIssueFilesCmd)
-	getIssueFilesCmd.Flags().
-		StringVarP(&ProjectID, "project", "p", "", "(Required) Your project id")
-	getIssueFilesCmd.MarkFlagRequired("project")
 
 	// Here you will define your flags and configuration settings.
 

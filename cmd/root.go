@@ -1,7 +1,6 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
-package cmd
+*/package cmd
 
 import (
 	"os"
@@ -10,6 +9,7 @@ import (
 )
 
 var ProjectID string
+var ApiKey string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -32,14 +32,10 @@ func Execute() {
 }
 
 func init() {
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.backlog-backup-sample.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// rootCmd.Flags().StringVarP(&ProjectID, "project", "p", "", "Your project id")
-	// rootCmd.MarkFlagRequired("project")
+	// 必須フラグの指定
+	rootCmd.PersistentFlags().
+		StringVarP(&ProjectID, "project", "p", "", "(Required) Your project id")
+	rootCmd.MarkPersistentFlagRequired("project")
+	rootCmd.PersistentFlags().StringVarP(&ApiKey, "apikey", "a", "", "(Required) Your api key")
+	rootCmd.MarkPersistentFlagRequired("apikey")
 }
