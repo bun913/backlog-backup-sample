@@ -3,13 +3,18 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 */package cmd
 
 import (
+	"fmt"
 	"os"
 
+	"github.com/go-resty/resty/v2"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
 
+// Command Args
 var ProjectID string
 var ApiKey string
+var SpaceID string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -31,11 +36,33 @@ func Execute() {
 	}
 }
 
+// Return New RestyClient setted apikey
+func NewRequestClient() *resty.Client {
+	client := resty.New()
+	client.BaseURL = getBaseUrl()
+	client.SetQueryParam("apiKey", ApiKey)
+	// json-iteratorをデフォルトのJSOnクライアントに設定
+	client.JSONMarshal = jsoniter.Marshal
+	return client
+}
+
+// Get Backlog API BaseURL
+func getBaseUrl() string {
+	baseURL := fmt.Sprintf("https://%s.backlog.com", SpaceID)
+	return baseURL
+}
+
 func init() {
-	// 必須フラグの指定
+	// 必須フラグのチェック
+	// SpaceID
+	rootCmd.PersistentFlags().StringVarP(&SpaceID, "space", "s", "", "(Required) Your space id")
+	rootCmd.MarkPersistentFlagRequired("space")
+	// ProjectID
 	rootCmd.PersistentFlags().
 		StringVarP(&ProjectID, "project", "p", "", "(Required) Your project id")
 	rootCmd.MarkPersistentFlagRequired("project")
+	ProjectID, _ = rootCmd.PersistentFlags().GetString("project")
+	// apiKey
 	rootCmd.PersistentFlags().StringVarP(&ApiKey, "apikey", "a", "", "(Required) Your api key")
 	rootCmd.MarkPersistentFlagRequired("apikey")
 }
