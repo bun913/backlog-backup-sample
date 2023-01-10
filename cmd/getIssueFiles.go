@@ -1,15 +1,23 @@
 /*
 Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
-package cmd
+*/package cmd
 
 import (
 	"fmt"
 	"log"
+	"net/http"
+	"os"
+	"path"
 
+	"github.com/go-resty/resty/v2"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 )
+
+type attachmentInfo struct {
+	id   string
+	name string
+}
 
 // getIssueFilesCmd represents the getIssueFiles command
 var getIssueFilesCmd = &cobra.Command{
@@ -18,39 +26,54 @@ var getIssueFilesCmd = &cobra.Command{
 	Short:   "get files attached project's issues",
 	Long:    `get files attached project's issues.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("getIssueFiles called")
+		// TODO: Issueを直渡ししている部分を修正する
+		issue := "EXPORTTEST-215"
 		client := NewRequestClient()
-		resp, err := client.R().Get(client.BaseURL + "/api/v2/issues/EXPORTTEST-215/attachments")
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(resp.StatusCode())
-		fileListResponse := jsoniter.Get(resp.Body())
-		// fmt.Println(string(resp.Body()))
-		fileList := fileListResponse.Get()
-		for i := 0; i < fileList.Size(); i++ {
-			fmt.Println("kitayo")
-			elm := fileList.Get(i)
-			fmt.Println(elm.Get("id").ToString())
+		fileList := getAttachedFileList(client, issue)
+		for _, attachment := range fileList {
+			downLoadFile(client, issue, attachment)
 		}
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(getIssueFilesCmd)
-	// TODO: SpaceIDもパラメーターとして渡したい
-	// まずはIssueIDは引数として渡されていると想定する
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// getIssueFilesCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// getIssueFilesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+func getAttachedFileList(client *resty.Client, issue string) []attachmentInfo {
+	// https://developer.nulab.com/ja/docs/backlog/api/2/get-list-of-issue-attachments/
+	resp, err := client.R().
+		Get(client.BaseURL + fmt.Sprintf("/api/v2/issues/%s/attachments", issue))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if resp.StatusCode() != http.StatusOK {
+		log.Fatalln("Request Fail:" + resp.String())
+	}
+	fileListResponse := jsoniter.Get(resp.Body())
+	fileList := fileListResponse.Get()
+	var attachmentList []attachmentInfo
+	for i := 0; i < fileList.Size(); i++ {
+		// ダウンロード
+		elm := fileList.Get(i)
+		attachmenID := elm.Get("id").ToString()
+		attachmentName := elm.Get("name").ToString()
+		ai := attachmentInfo{id: attachmenID, name: attachmentName}
+		attachmentList = append(attachmentList, ai)
+	}
+	return attachmentList
 }
 
-// func GetAttachedFiles(issueIDList: []string) {
+func downLoadFile(client *resty.Client, issue string, attachement attachmentInfo) {
+	// NOTE: 添付ファイルの保存先はユーザーに選んでもらえればなお良い
+	baseDir, _ := os.Getwd()
+	attachmentFileDir := "attachedFiles"
+	outpuDir := path.Join(baseDir, attachmentFileDir, issue)
+	os.MkdirAll(outpuDir, os.ModePerm)
+	// https://developer.nulab.com/ja/docs/backlog/api/2/get-issue-attachment/#
+	url := client.BaseURL + fmt.Sprintf("/api/v2/issues/%s/attachments/%s", issue, attachement.id)
+	_, err := client.R().SetOutput(path.Join(outpuDir, attachement.name)).Get(url)
+	if err != nil {
+		log.Fatalln("DownLoad AttachedFile Fail")
+	}
+}
 
-// }
+func init() {
+	rootCmd.AddCommand(getIssueFilesCmd)
+}

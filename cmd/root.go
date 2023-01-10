@@ -4,7 +4,9 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 
 import (
 	"fmt"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-resty/resty/v2"
 	jsoniter "github.com/json-iterator/go"
@@ -43,6 +45,14 @@ func NewRequestClient() *resty.Client {
 	client.SetQueryParam("apiKey", ApiKey)
 	// json-iteratorをデフォルトのJSOnクライアントに設定
 	client.JSONMarshal = jsoniter.Marshal
+	// 429リクエストの際にリトライを行う
+	// 1分間とする理由（https://backlog.com/ja/blog/backlog-api-rate-limit-announcement/）
+	client.AddRetryCondition(
+		func(r *resty.Response, err error) bool {
+			return r.StatusCode() == http.StatusTooManyRequests
+		},
+	)
+	client.SetRetryCount(3).SetRetryMaxWaitTime(1 * time.Minute)
 	return client
 }
 
