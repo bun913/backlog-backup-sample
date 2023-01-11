@@ -25,8 +25,8 @@ type attachmentInfo struct {
 var getIssueFilesCmd = &cobra.Command{
 	Use:     "getIssueFiles",
 	Aliases: []string{"gif"},
-	Short:   "get files attached project's issues",
-	Long:    `get files attached project's issues.`,
+	Short:   "get files attached space's issues",
+	Long:    `get files attached space's issues.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("CSVの読み込み開始")
 		f := openExportedCsv()

@@ -14,7 +14,6 @@ import (
 )
 
 // Command Args
-var ProjectID string
 var ApiKey string
 var SpaceID string
 var CsvFile string
@@ -69,11 +68,6 @@ func init() {
 	// SpaceID
 	rootCmd.PersistentFlags().StringVarP(&SpaceID, "space", "s", "", "(Required) Your space id")
 	rootCmd.MarkPersistentFlagRequired("space")
-	// ProjectID
-	rootCmd.PersistentFlags().
-		StringVarP(&ProjectID, "project", "p", "", "(Required) Your project id")
-	rootCmd.MarkPersistentFlagRequired("project")
-	ProjectID, _ = rootCmd.PersistentFlags().GetString("project")
 	// apiKey
 	rootCmd.PersistentFlags().StringVarP(&ApiKey, "apikey", "a", "", "(Required) Your api key")
 	rootCmd.MarkPersistentFlagRequired("apikey")
