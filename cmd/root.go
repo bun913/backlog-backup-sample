@@ -17,6 +17,7 @@ import (
 var ProjectID string
 var ApiKey string
 var SpaceID string
+var CsvFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -52,7 +53,7 @@ func NewRequestClient() *resty.Client {
 			return r.StatusCode() == http.StatusTooManyRequests
 		},
 	)
-	client.SetRetryCount(3).SetRetryMaxWaitTime(1 * time.Minute)
+	client.SetRetryCount(3).SetRetryWaitTime(65 * time.Second)
 	return client
 }
 
@@ -62,6 +63,7 @@ func getBaseUrl() string {
 	return baseURL
 }
 
+// 初期化
 func init() {
 	// 必須フラグのチェック
 	// SpaceID
