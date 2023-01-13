@@ -14,6 +14,7 @@ import (
 )
 
 // Command Args
+// TODO: グローバルではなくローカルにして引き渡す方が良い
 var ApiKey string
 var SpaceID string
 var CsvFile string
