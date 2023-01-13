@@ -15,7 +15,7 @@
 
 詳細・経緯は以下ブログをご参照ください。
 
-TODO: 後でブログへのリンクを貼る
+https://dev.classmethod.jp/articles/backilogapi_get_issue_attached_files/
 
 ## 必要要件
 
