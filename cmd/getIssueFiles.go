@@ -98,13 +98,14 @@ func downLoadFile(client *resty.Client, issue string, attachement attachmentInfo
 	url := client.BaseURL + fmt.Sprintf("/api/v2/issues/%s/attachments/%s", issue, attachement.id)
 	_, err := client.R().SetOutput(path.Join(outpuDir, attachement.name)).Get(url)
 	if err != nil {
-		log.Fatalln("DownLoad AttachedFile Fail")
+		log.Fatalln("DownLoad IssueAttachedFile Fail", err)
 	}
 }
 
 func init() {
 	rootCmd.AddCommand(getIssueFilesCmd)
 	// csvFile
-	rootCmd.PersistentFlags().StringVarP(&CsvFile, "csv", "c", "", "(Required) exported csv(https://support-ja.backlog.com/hc/ja/articles/360035642534-%E8%AA%B2%E9%A1%8C%E6%A4%9C%E7%B4%A2%E7%B5%90%E6%9E%9C%E4%B8%80%E8%A6%A7%E3%81%AE%E5%87%BA%E5%8A%9B)")
-	rootCmd.MarkPersistentFlagRequired("csv")
+	getIssueFilesCmd.PersistentFlags().
+		StringVarP(&CsvFile, "csv", "c", "", "(Required) exported csv(https://support-ja.backlog.com/hc/ja/articles/360035642534-%E8%AA%B2%E9%A1%8C%E6%A4%9C%E7%B4%A2%E7%B5%90%E6%9E%9C%E4%B8%80%E8%A6%A7%E3%81%AE%E5%87%BA%E5%8A%9B)")
+	getIssueFilesCmd.MarkPersistentFlagRequired("csv")
 }
