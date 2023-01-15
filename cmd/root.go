@@ -18,6 +18,7 @@ import (
 var ApiKey string
 var SpaceID string
 var CsvFile string
+var ProjectID string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{

@@ -19,5 +19,7 @@
 
 # Go workspace file
 go.work
-attachedFiles
+# 不要ファイル
 .DS_Store
+wiki/
+attachedFiles
